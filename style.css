@@ -1,0 +1,66 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: black;
+}
+
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;  
+  height: 100% !important;  
+  display: block;
+}
+
+h1.title {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 10;        /* 캔버스 위에 나타남 */
+  color: white;
+  font-family: 'Gothic A1', sans-serif;
+}
+
+/* 버튼 묶는 컨테이너 */
+.button-row {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;     /* 버튼 사이 간격 */
+  z-index: 9999; /* 캔버스 위로 */
+}
+
+/* 링크 밑줄 제거 */
+.button-row a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 버튼 기본 스타일 */
+.button-row button {
+  all: unset;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  background: black;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  transition: 0.25s;
+  font-size: 14px;
+}
+
+/* hover 효과 */
+.button-row button:hover {
+  background: white;
+  color: black;
+}
+
