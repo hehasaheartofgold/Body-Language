@@ -15,43 +15,27 @@ canvas {
   display: block;
 }
 
-h1.title {
+.fixer {
   position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
+  margin: 20;
+  left: 20px;
   z-index: 10;        /* 캔버스 위에 나타남 */
-  color: white;
+  color: yellow;
+  text-shadow: 0 0 7px red, 0 0 10px red, 0 0 21px red;
+  font-size: 20px;
   font-family: 'Gothic A1', sans-serif;
 }
 
-/* 버튼 묶는 컨테이너 */
-.button-row {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 12px;     /* 버튼 사이 간격 */
-  z-index: 9999; /* 캔버스 위로 */
-}
-
-/* 링크 밑줄 제거 */
-.button-row a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* 버튼 기본 스타일 */
-.button-row button {
+/* 공통 버튼 스타일 */
+button {
   all: unset;
-  padding: 10px 18px;
+  padding: 5px 10px;
   border-radius: 8px;
-  border: 1px solid #fff;
-  background: black;
-  color: white;
+  border: 1px solid red;
+  background: red;
+  color: yellow;
   cursor: pointer;
+  box-shadow: 0 0 7px red, 0 0 10px red, 0 0 21px red;
   font-family: inherit;
   text-align: center;
   transition: 0.25s;
@@ -59,8 +43,48 @@ h1.title {
 }
 
 /* hover 효과 */
-.button-row button:hover {
+button:hover {
   background: white;
   color: black;
 }
 
+/* 위치는 이미 잘 되어 있음 */
+.button-left {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+}
+
+.button-right {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+/* 링크 밑줄 제거 */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+@media (max-width: 768px){
+  .button-right{
+    display: none;
+  }
+  .button-left{
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  button {
+  padding: 1px 5px;
+  font-size: 12px;
+}
+
+  .fixer{
+    font-size: 15px;
+  }
+}
