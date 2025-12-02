@@ -1,11 +1,16 @@
 // ─────────────────────────────
 //  Handpose + Floating Text Particles with Collision & Home Return
+//  (카메라 화면비 유지 + 해상도 다운스케일 버전)
 // ─────────────────────────────
 
 let handPose;
 let video;
 let hands = [];
 let connections;
+
+// 화면비 대응용 상태
+let camReady = false;
+let sceneReady = false;
 
 // ★ 로컬 loadFont() 제거 → 대신 이름만 문자열로 사용
 let fontName = "Gothic A1, sans-serif";
@@ -75,7 +80,6 @@ let letters = [];
 //  preload
 // ─────────────────────────────
 function preload() {
-  // ★ 로컬 폰트 삭제 → loadFont() 없음
   handPose = ml5.handPose({ flipped: true });
   connections = handPose.getConnections();
 }
@@ -84,19 +88,38 @@ function preload() {
 //  setup
 // ─────────────────────────────
 function setup() {
+  // 임시 캔버스, 나중에 카메라 화면비에 맞춰서 변경
   createCanvas(640, 480);
 
-  video = createCapture(VIDEO, { flipped: true });
-  video.size(640, 480);
+  // flipped: true 옵션은 그대로 두되, 콜백으로 camReady 세팅
+  video = createCapture(
+    { video: true, audio: false }, 
+    () => {
+      camReady = true;
+    }
+  );
+  // 위 constraints가 마음에 안 들면 그냥 VIDEO만 써도 됨:
+  // video = createCapture(VIDEO, () => { camReady = true; });
+
   video.hide();
 
-  handPose.detectStart(video, gotHands);
-
-  // ★ 웹폰트 설정
   textFont(fontName);
   textAlign(CENTER, CENTER);
+}
 
+// ─────────────────────────────
+//  카메라 화면비 기반으로 씬 초기화
+// ─────────────────────────────
+function initScene() {
+  letters = [];
+
+  // 글자들 생성 (이 시점에서 width/height는 targetW/targetH)
   spawnLetters();
+
+  // 캔버스/영상 해상도 세팅이 끝난 뒤에 handpose 시작
+  handPose.detectStart(video, gotHands);
+
+  sceneReady = true;
 }
 
 // ─────────────────────────────
@@ -105,6 +128,39 @@ function setup() {
 function draw() {
   background(0);
 
+  // 카메라 준비 안 됐거나 메타데이터(해상도) 아직 없으면 대기
+  if (!camReady || video.elt.videoWidth === 0 || video.elt.videoHeight === 0) {
+    fill(255);
+    textAlign(LEFT, TOP);
+    text("camera loading...", 20, 20);
+    return;
+  }
+
+  // 아직 화면비 / 해상도에 맞춘 초기화 전이라면 → 여기서 한 번만 설정
+  if (!sceneReady) {
+    let camW = video.elt.videoWidth;
+    let camH = video.elt.videoHeight;
+
+    // 카메라 화면비
+    let aspect = camW / camH;
+
+    // 🔥 가로 기준: 640px에 맞추되, 화면비 유지
+    let baseWidth = 640;
+    let targetW = baseWidth;
+    let targetH = round(baseWidth / aspect);
+
+    // (또는 세로 기준)
+    // let baseHeight = 480;
+    // let targetH = baseHeight;
+    // let targetW = round(baseHeight * aspect);
+
+    resizeCanvas(targetW, targetH);
+    video.size(targetW, targetH);
+
+    initScene();
+  }
+
+  // 여기부터는 sceneReady가 true라고 가정
   drawSkeleton();
   drawKeypoints();
   updateAndDrawLetters();
@@ -188,7 +244,6 @@ class Letter {
     this.vx = random(-5, 5);
     this.vy = random(-5, 5);
 
-    // 한글 또는 프랑스어에 따라 물리값 다르게
     if (type === "hangul") {
       this.friction = 0.98;
       this.baseAlpha = 255;
@@ -202,7 +257,6 @@ class Letter {
     this.alpha = this.baseAlpha;
     this.tension = 0;
 
-    // ★ textBounds() 삭제 → width, height 계산 방식 변경
     textSize(this.size);
     this.w = textWidth(this.char);
     this.h = this.size * 1.2;
@@ -237,7 +291,6 @@ class Letter {
 
     for (let h = 0; h < hands.length; h++) {
       let hand = hands[h];
-
       let palm = getPalmCenter(hand);
 
       // ---- 한글: 손가락 → 손바닥으로 전환하는 궤도 ----
@@ -305,7 +358,7 @@ class Letter {
   }
 
   draw() {
-    textFont(fontName);   // ★ 웹폰트 사용
+    textFont(fontName);
     textSize(this.size);
 
     const baseR = 154;
@@ -331,10 +384,14 @@ class Letter {
 // ─────────────────────────────
 function spawnLetters() {
   for (let i = 0; i < 50; i++) {
-    letters.push(new Letter(random(width), random(height), random(hangulChars), "hangul"));
+    letters.push(
+      new Letter(random(width), random(height), random(hangulChars), "hangul")
+    );
   }
   for (let i = 0; i < 100; i++) {
-    letters.push(new Letter(random(width), random(height), random(frenchChars), "french"));
+    letters.push(
+      new Letter(random(width), random(height), random(frenchChars), "french")
+    );
   }
 }
 
