@@ -126,7 +126,7 @@ function initScene() {
 //  draw
 // ─────────────────────────────
 function draw() {
-  background(0);
+  background(0,255,0);
 
   // 카메라 준비 안 됐거나 메타데이터(해상도) 아직 없으면 대기
   if (!camReady || video.elt.videoWidth === 0 || video.elt.videoHeight === 0) {
@@ -223,7 +223,8 @@ function drawKeypoints() {
     for (let j = 0; j < hand.keypoints.length; j++) {
       let keypoint = hand.keypoints[j];
       noStroke();
-      circle(keypoint.x, keypoint.y, 10);
+      fill(255,200,0)
+      circle(keypoint.x, keypoint.y, 5);
     }
   }
 }
@@ -240,7 +241,7 @@ class Letter {
     this.char = ch;
     this.type = type;
 
-    this.size = random(10, 22);
+    this.size = random(8, 16);
     this.vx = random(-5, 5);
     this.vy = random(-5, 5);
 
@@ -300,8 +301,8 @@ class Letter {
         let dyTip = tip.y - this.y;
         let dTip = sqrt(dxTip * dxTip + dyTip * dyTip);
 
-        let range = 220;
-        let switchDist = 80;
+        let range = 130;
+        let switchDist = 120;
 
         if (dTip < range) {
           influenced = true;
@@ -317,8 +318,8 @@ class Letter {
           let targetX = cx + cos(this.orbitAngle) * this.orbitRadius;
           let targetY = cy + sin(this.orbitAngle) * this.orbitRadius;
 
-          this.x = lerp(this.x, targetX, 0.04);
-          this.y = lerp(this.y, targetY, 0.04);
+          this.x = lerp(this.x, targetX, 0.08);
+          this.y = lerp(this.y, targetY, 0.08);
 
           this.tension = lerp(this.tension, 1, 0.2);
           this.alpha = lerp(this.alpha, 255, 0.2);
@@ -361,14 +362,14 @@ class Letter {
     textFont(fontName);
     textSize(this.size);
 
-    const baseR = 154;
-    const baseG = 205;
-    const baseB = 50;
+    const baseR = 0;
+    const baseG = 0;
+    const baseB = 255;
 
     let r = baseR, g = baseG, b = baseB;
 
     if (this.type === "hangul") {
-      const hotR = 218, hotG = 112, hotB = 214;
+      const hotR = 255, hotG = 0, hotB = 0;
       r = lerp(baseR, hotR, this.tension);
       g = lerp(baseG, hotG, this.tension);
       b = lerp(baseB, hotB, this.tension);
